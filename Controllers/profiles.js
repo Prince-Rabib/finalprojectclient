@@ -16,7 +16,7 @@ router.get('/me', auth, async(req, res) => {
 
       }
       
-      res.json(profile);
+      res.status(200).json(profile);
 
     
   } catch (error) {
@@ -26,10 +26,44 @@ router.get('/me', auth, async(req, res) => {
   }
 });
 
-router.post('/', [auth, [
-  check('status', 'Status is required').not().isEmpty(),
-  check('skills','Skills is required').not().isEmpty()
- ]
+router.get('/all/:id', auth, async(req, res) => {
+
+  try {
+        
+      const profile = await Profile.findOne({user: req.params.id}).populate('user', ['name' ,'avatar']);
+      if(!profile){
+          return res.status(400).json({msg: 'there is nor profile available right now'});
+
+      }
+      
+      res.status(200).json(profile);
+
+    
+  } catch (error) {
+
+    console.error(error.message);
+    res.status(500).send('Server Error')
+  }
+});
+
+router.get('/:id', auth, async(req, res) => {
+
+  try {
+        
+      const profile = await Profile.findOne({user: req.params.id}).populate('user', ['name' ,'avatar']);
+      console.log(profile);
+      if(!profile){
+          return res.status(400).json({msg: 'there is no profile available right now'});
+
+      }     
+      res.status(200).json(profile); 
+
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send('Server Error')
+  }
+});
+router.post('/', [auth
 ], async(req,res)=>{
    
    const errors = validationResult(req);
@@ -38,13 +72,12 @@ router.post('/', [auth, [
    }
 
   const {
-     company,
-     website,
-     location,
+     profileimage,
+     coverimage,
      bio,
+     address,
+     phone,
      status,
-     githubusername,
-     skills,
      youtube,
      facebook,
      twitter,
@@ -55,16 +88,13 @@ router.post('/', [auth, [
    const profileFields ={};
 
     profileFields.user = req.user.id;
-    if(company) profileFields.company = company;
-    if(website) profileFields.website= website;
-    if(location) profileFields.location = location;
+    if(profileimage) profileFields.profileimage = profileimage;
+    if(coverimage) profileFields.coverimage= coverimage;
     if(bio) profileFields.bio = bio;
-    if(status) profileFields.status = status;
-    if(githubusername) profileFields.githubusername= githubusername;
-    if(skills) {
-       profileFields.skills = skills.split(',').map(result => result.trim());
-    }
-    
+    if(address) profileFields.address = address;
+    if(phone) profileFields.phone = phone;
+    if(status) profileFields.status= status;
+
     profileFields.social = {};
     if(youtube) profileFields.social.youtube = youtube;
     if(twitter) profileFields.social.twitter = twitter;
@@ -128,12 +158,7 @@ router.delete('/', auth, async(req,res)=>{
    }
 })
 
-router.put('/experience', [auth, [
-  
-    check('title', "title is required").not().isEmpty(),
-    check('company', "title is required").not().isEmpty(),
-    check('from', "title is required").not().isEmpty()
-]], async(req,res)=>{
+router.put('/watchlist', [auth], async(req,res)=>{
 
    const errors = validationResult(req);
    if(!errors.isEmpty()){
@@ -142,29 +167,23 @@ router.put('/experience', [auth, [
 
       const {
          title,
-         company,
-         location,
-         from,
-         to,
-         current,
-         description
+         image,
+         ratting,
+         tmdb
       } = req.body
 
 
       const exp = {
          title,
-         company,
-         location,
-         from,
-         to,
-         current,
-         description
+         image,
+         ratting,
+         tmdb
       }
 
        try {
             
             const profile = await Profile.findOne({user: req.user.id});
-            profile.experience.unshift(exp);
+            profile.watchlist.unshift(exp);
 
             await profile.save();
             res.json(profile);
@@ -179,15 +198,15 @@ router.put('/experience', [auth, [
 
 })
 
-router.delete('/experience/:exp_id', auth, async(req,res)=>{
+router.delete('/watchlist/:idx', auth, async(req,res)=>{
    
      try {
         
         const profile = await Profile.findOne({user: req.user.id});
-        const removeIndex = profile.experience.map(result => result._id).indexOf(req.params.exp_id);
-        profile.experience.splice(removeIndex, 1);
+        
+        await profile.watchlist.pull({ _id: req.params.idx });
 
-        await profile.save;
+        await profile.save();
         res.json(profile);
      } catch (error) {
         console.error(error.message);

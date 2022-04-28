@@ -8,11 +8,55 @@ const User = require('../Models/User');
 const jwt = require('jsonwebtoken');
 const config = require('config');
 
-const { check, validationResult } = require('express-Validator');
+const { check, validationResult } = require('express-validator');
 
 router.get('/', (req, res) => {
   res.send('User users');
 });
+
+
+router.get('/all' ,async(req, res) => {
+  try {
+    const user = await User.find();
+     res.json(user)
+    
+  } catch (error) {
+
+    console.error(error.message);
+    
+  }
+     
+});
+
+router.post('/all' ,async(req, res) => {
+  try {
+    const user = await User.find({name:req.body.name});
+    console.log(user)
+     res.json(user)
+    
+  } catch (error) {
+
+    console.error(error.message);
+    
+  }
+     
+});
+
+router.delete('/:id', async(req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+     await user.remove();
+     res.json({msg:'User Removed'})
+    
+  } catch (error) {
+
+    console.error(error.message); 
+  }
+});
+
+
+
 
 router.post(
   '/',

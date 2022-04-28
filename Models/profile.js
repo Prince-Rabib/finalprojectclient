@@ -12,86 +12,38 @@ const ProfileSchema = new Schema({
     required: false,
     max: 40
   },
-  company: {
+  profileimage: {
+    type: String
+  }, 
+  coverimage: {
+    type: String
+  }, 
+  bio: {
     type: String
   },
-  website: {
+  address: {
     type: String
   },
-  location: {
+  phone: {
     type: String
   },
   status: {
     type: String,
-    required: true
   },
-  skills: {
-    type: [String],
-    required: true
-  },
-  bio: {
-    type: String
-  },
-  githubusername: {
-    type: String
-  },
-  experience: [
+  watchlist: [
     {
       title: {
         type: String,
-        required: true
       },
-      company: {
+      image: {
         type: String,
-        required: true
       },
-      location: {
+      ratting: {
         type: String
       },
-      from: {
-        type: Date,
-        required: true
-      },
-      to: {
-        type: Date
-      },
-      current: {
-        type: Boolean,
-        default: false
-      },
-      description: {
+      tmdb: {
         type: String
-      }
-    }
-  ],
-  education: [
-    {
-      school: {
-        type: String,
-        required: true
       },
-      degree: {
-        type: String,
-        required: true
-      },
-      fieldofstudy: {
-        type: String,
-        required: true
-      },
-      from: {
-        type: Date,
-        required: true
-      },
-      to: {
-        type: Date
-      },
-      current: {
-        type: Boolean,
-        default: false
-      },
-      description: {
-        type: String
-      }
     }
   ],
   social: {

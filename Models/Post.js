@@ -10,6 +10,14 @@ const postSchema = new Schema({
          type: String,
          required: true
      },
+     image : { 
+         type: String,
+         required: true
+     },
+      shows : { 
+         type: String,
+         required: true
+     },
      name: { 
          type: String,
          
@@ -44,7 +52,11 @@ const postSchema = new Schema({
                  type:String,
             }
          }
-     ]
+     ],
+ date: {
+    type: Date,
+    default: Date.now,
+  },
 })
 
 module.exports = post = mongoose.model('Post', postSchema);

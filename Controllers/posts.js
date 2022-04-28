@@ -26,6 +26,9 @@ router.post('/',[auth,
   [
     check('text','Text is required')
     .not()
+    .isEmpty(),
+    check('image','image is required')
+    .not()
     .isEmpty()
   ]
   ],async(req,res)=>{
@@ -40,6 +43,8 @@ router.post('/',[auth,
       const user = await User.findById(req.user.id).select('-password');
       const post = new Post({
           text : req.body.text,
+          image : req.body.image,
+          shows : req.body.shows,
           name : user.name,
           avatar: user.avatar,
           user: req.user.id
@@ -79,13 +84,8 @@ router.get('/:id',auth, async(req, res) => {
 router.delete('/:id',auth, async(req, res) => {
   try {
     const post = await Post.findById(req.params.id);
-     if(!post){
-      return res.status(404).json({msg: 'post is not found'})
-      }
+    console.log(post);
 
-     if(post.user.toString() !== req.user.id){
-         return res.status(404).json({msg: 'post is not found'})
-     }
      await post.remove();
      res.json({msg:'Post Removed'})
     
@@ -104,7 +104,12 @@ router.put('/like/:id',auth, async(req,res)=>{
       try {
           const post = await Post.findById(req.params.id);
           if(post.likes.filter(like=> like.user.toString() === req.user.id).length>0){
-             return res.status(400).json({msg:'You have already liked'});
+                  const removeLike = post.likes.map(result => result.user.toString()).indexOf(req.user.id);
+                  post.likes.splice(removeLike, 1)
+                  await post.save();
+
+                  
+             return res.status(200).json({msg:'You have already liked'});
           }
           console.log('done');
           post.likes.unshift({user: req.user.id});
