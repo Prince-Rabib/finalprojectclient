@@ -9,7 +9,7 @@ const bcrypt = require('bcrypt');
 const User = require('../Models/User');
 const jwt = require('jsonwebtoken');
 const config = require('config');
-const { check, validationResult } = require('express-Validator');
+const { check, validationResult } = require('express-validator');
 
 router.get('/', auth ,async(req, res) => {
 
